@@ -1,0 +1,15 @@
+# Entorno virtual (¡Prohibido subirlo!)
+venv/
+.env
+
+# Archivos de datos pesados (El CSV pasadlo por un pendrive o Drive)
+data/raw/
+data/processed/*.csv
+
+# Archivos basura de Python
+__pycache__/
+*.pyc
+.ipynb_checkpoints/
+
+# Modelos pesados (opcional, pero recomendable no subirlos)
+models/*.pkl
