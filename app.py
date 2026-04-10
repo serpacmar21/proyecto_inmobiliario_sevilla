@@ -1,7 +1,6 @@
 import streamlit as st
 import pandas as pd
 import joblib
-from sklearn.preprocessing import LabelEncoder
 
 # 1. CONFIGURACIÓN DE LA PÁGINA
 st.set_page_config(
@@ -17,16 +16,40 @@ st.write("Esta herramienta utiliza un modelo **Random Forest** entrenado con dat
 st.markdown("---")
 
 # 2. CARGA DE RECURSOS (Modelo y Datos)
-@st.cache_resource
+
+def normalizar_house_type(df):
+    df['house_type'] = df['house_type'].astype(str).str.strip()
+    df['house_type'] = df['house_type'].replace({
+    'Casa o chalet independiente': 'Casa o chalet',
+    'Chalet pareado': 'Chalet',
+    'Chalet adosado': 'Chalet',
+    'Casa de pueblo': 'Casa',
+    'Casa rural': 'Casa',
+    'Casa terrera': 'Casa',
+    'Torre': 'Piso',
+    })
+    return df
+
+
+def es_extra_logico(tipo, columna):
+    if tipo == 'Piso' and columna == 'garden':
+        return False
+    return True
+
+
 def cargar_recursos():
     # Cargamos el modelo entrenado (.pkl)
     modelo = joblib.load('models/modelo_casas_sevilla.pkl')
     # Cargamos el CSV limpio para los filtros interactivos
     df_datos = pd.read_csv('data/processed/viviendas_sevilla_limpio.csv')
-    return modelo, df_datos
+    # Normalizamos los tipos de vivienda para que el desplegable solo muestre categorías limpias
+    df_datos = normalizar_house_type(df_datos)
+    # Cargamos los encoders
+    encoders = joblib.load('models/diccionario_encoders.pkl')
+    return modelo, df_datos, encoders
 
 try:
-    modelo, df = cargar_recursos()
+    modelo, df, encoders = cargar_recursos()
 
     # 3. INTERFAZ DE USUARIO (Dos columnas principales)
     col_izq, col_der = st.columns([1, 1], gap="large")
@@ -54,7 +77,7 @@ try:
             help="El estado afecta significativamente a la valoración final del inmueble."
         )
 
-        metros = st.slider("Superficie Total (m²)", 25, 1000, 95)
+        metros = st.number_input("Superficie Total (m²)", min_value=25, max_value=1000, value=95)
         
         c1, c2 = st.columns(2)
         with c1:
@@ -72,20 +95,21 @@ try:
                     (df['house_type'] == tipo_sel)]
 
         def extra_disponible(columna):
-            if len(subset) == 0: return True 
+            if len(subset) == 0:
+                return True
             return subset[columna].max() == 1 
 
         # Checkboxes condicionales
         e1, e2 = st.columns(2)
         with e1:
-            piscina = st.checkbox("Piscina Privada/Comunitaria 🏊‍♂️") if extra_disponible('swimming_pool') else False
-            garaje = st.checkbox("Plaza de Garaje 🚗") if extra_disponible('garage') else False
-            ascensor = st.checkbox("Ascensor 🛗") if extra_disponible('lift') else False
-            terraza = st.checkbox("Terraza ☀️") if extra_disponible('terrace') else False
+            piscina = st.checkbox("Piscina Privada/Comunitaria 🏊‍♂️") if extra_disponible('swimming_pool') and es_extra_logico(tipo_sel, 'swimming_pool') else False
+            garaje = st.checkbox("Plaza de Garaje 🚗") if extra_disponible('garage') and es_extra_logico(tipo_sel, 'garage') else False
+            ascensor = st.checkbox("Ascensor 🛗") if extra_disponible('lift') and es_extra_logico(tipo_sel, 'lift') else False
+            terraza = st.checkbox("Terraza ☀️") if extra_disponible('terrace') and es_extra_logico(tipo_sel, 'terrace') else False
         with e2:
-            jardin = st.checkbox("Jardín 🌳") if extra_disponible('garden') else False
-            trastero = st.checkbox("Trastero 📦") if extra_disponible('storage_room') else False
-            balcon = st.checkbox("Balcón / Mirador 🖼️") if extra_disponible('balcony') else False
+            jardin = st.checkbox("Jardín 🌳") if extra_disponible('garden') and es_extra_logico(tipo_sel, 'garden') else False
+            trastero = st.checkbox("Trastero 📦") if extra_disponible('storage_room') and es_extra_logico(tipo_sel, 'storage_room') else False
+            balcon = st.checkbox("Balcón / Mirador 🖼️") if extra_disponible('balcony') and es_extra_logico(tipo_sel, 'balcony') else False
 
         st.markdown("<br><br>", unsafe_allow_html=True)
 
@@ -94,17 +118,20 @@ try:
             
             # Traductor en caliente para la IA
             def codificar_local(columna, valor):
-                le = LabelEncoder()
-                le.fit(df[columna])
+                le = encoders[columna]
                 return le.transform([valor])[0]
 
             ciudad_num = codificar_local('loc_city', ciudad_sel)
             distrito_num = codificar_local('loc_district', distrito_sel)
             tipo_num = codificar_local('house_type', tipo_sel)
 
-            # Lógica para transformar el selector de estado a unos y ceros
-            reforma_num = 1 if estado_sel == "A reformar" else 0
-            obra_nueva_num = 1 if estado_sel == "Obra nueva" else 0
+            # Lógica para transformar el selector de estado a factores de ajuste
+            if estado_sel == "Buen estado":
+                factor_estado = 1.0
+            elif estado_sel == "A reformar":
+                factor_estado = 0.85  # Reducción por reformas necesarias
+            elif estado_sel == "Obra nueva":
+                factor_estado = 1.15  # Aumento por ser obra nueva
 
             # Preparamos los datos EXACTAMENTE en el orden del entrenamiento
             datos_entrada = pd.DataFrame({
@@ -121,16 +148,16 @@ try:
                 'storage_room': [1 if trastero else 0],
                 'lift': [1 if ascensor else 0],
                 'garden': [1 if jardin else 0],
-                'is_needs_renovating': [reforma_num],
-                'is_new_development': [obra_nueva_num]
+                'is_needs_renovating': [0],  # Fijado a 0, usamos factor manual
+                'is_new_development': [0]   # Fijado a 0, usamos factor manual
             })
 
             # Predicción base (según datos históricos)
             prediccion_base = modelo.predict(datos_entrada)[0]
 
-            # Factor de Actualización (+25% estimado)
+            # Factores de Actualización
             factor_2026 = 1.25 
-            valor_final = prediccion_base * factor_2026
+            valor_final = prediccion_base * factor_2026 * factor_estado
 
             # Resultados
             st.success(f"## Valor Estimado: {valor_final:,.2f} €")
@@ -139,7 +166,7 @@ try:
             with st.expander("Ver análisis detallado del precio"):
                 st.write(f"**Precio base histórico:** {prediccion_base:,.2f} €")
                 st.write(f"**Ajuste por mercado actual (2026):** +25%")
-                st.write(f"**Estado del inmueble:** {estado_sel}")
+                st.write(f"**Factor por estado ({estado_sel}):** {factor_estado:.2f}")
                 st.write(f"**Precio estimado por m²:** {int(valor_final/metros)} €/m²")
                 st.info("Este cálculo se ha ajustado para reflejar la evolución del mercado y la condición física seleccionada.")
 
