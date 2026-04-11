@@ -1,116 +1,41 @@
-streamlit
-pandas
-scikit-learn
-joblib
-plotly
-dagster
-dask[complete] 
-distributed
-plotnine
-geopy 
- 
- J i n j a 2 = = 3 . 1 . 6 
- 
- j o b l i b = = 1 . 5 . 3 
- 
- j s o n s c h e m a = = 4 . 2 6 . 0 
- 
- j s o n s c h e m a - s p e c i f i c a t i o n s = = 2 0 2 5 . 9 . 1 
- 
- j u p y t e r _ c l i e n t = = 8 . 8 . 0 
- 
- j u p y t e r _ c o r e = = 5 . 9 . 1 
- 
- k i w i s o l v e r = = 1 . 5 . 0 
- 
- l o c k e t = = 1 . 0 . 0 
- 
- M a r k u p S a f e = = 3 . 0 . 3 
- 
- m a t p l o t l i b = = 3 . 1 0 . 8 
- 
- m a t p l o t l i b - i n l i n e = = 0 . 2 . 1 
- 
- n a r w h a l s = = 2 . 1 9 . 0 
- 
- n e s t - a s y n c i o = = 1 . 6 . 0 
- 
- n u m p y = = 2 . 4 . 4 
- 
- p a c k a g i n g = = 2 6 . 0 
- 
- p a n d a s = = 3 . 0 . 2 
- 
- p a r s o = = 0 . 8 . 6 
- 
- p a r t d = = 1 . 4 . 2 
- 
- p i l l o w = = 1 2 . 2 . 0 
- 
- p l a t f o r m d i r s = = 4 . 9 . 6 
- 
- p r o m p t _ t o o l k i t = = 3 . 0 . 5 2 
- 
- p r o t o b u f = = 7 . 3 4 . 1 
- 
- p s u t i l = = 7 . 2 . 2 
- 
- p u r e _ e v a l = = 0 . 2 . 3 
- 
- p y a r r o w = = 2 3 . 0 . 1 
- 
- p y d e c k = = 0 . 9 . 1 
- 
- P y g m e n t s = = 2 . 2 0 . 0 
- 
- p y p a r s i n g = = 3 . 3 . 2 
- 
- p y t h o n - d a t e u t i l = = 2 . 9 . 0 . p o s t 0 
- 
- P y Y A M L = = 6 . 0 . 3 
- 
- p y z m q = = 2 7 . 1 . 0 
- 
- r e f e r e n c i n g = = 0 . 3 7 . 0 
- 
- r e q u e s t s = = 2 . 3 3 . 1 
- 
- r p d s - p y = = 0 . 3 0 . 0 
- 
- s c i k i t - l e a r n = = 1 . 8 . 0 
- 
- s c i p y = = 1 . 1 7 . 1 
- 
- s e a b o r n = = 0 . 1 3 . 2 
- 
- s i x = = 1 . 1 7 . 0 
- 
- s m m a p = = 5 . 0 . 3 
- 
- s t a c k - d a t a = = 0 . 6 . 3 
- 
- s t r e a m l i t = = 1 . 5 6 . 0 
- 
- t e n a c i t y = = 9 . 1 . 4 
- 
- t h r e a d p o o l c t l = = 3 . 6 . 0 
- 
- t o m l = = 0 . 1 0 . 2 
- 
- t o o l z = = 1 . 1 . 0 
- 
- t o r n a d o = = 6 . 5 . 5 
- 
- t r a i t l e t s = = 5 . 1 4 . 3 
- 
- t y p i n g _ e x t e n s i o n s = = 4 . 1 5 . 0 
- 
- t z d a t a = = 2 0 2 6 . 1 
- 
- u r l l i b 3 = = 2 . 6 . 3 
- 
- w a t c h d o g = = 6 . 0 . 0 
- 
- w c w i d t h = = 0 . 6 . 0 
+# Librerías de Análisis de Datos
+pandas>=2.0.0
+numpy>=2.0.0
+scikit-learn>=1.3.0
+scipy>=1.10.0
+
+# Librerías de Deep Learning
+keras>=3.0.0
+torch>=2.0.0
+
+# Librerías de Procesamiento Distribuido
+dask[complete]>=2023.0.0
+distributed>=2023.0.0
+dask-ml>=0.19.0
+
+# Librerías de Orquestación
+dagster>=1.5.0
+
+# Librerías de Visualización
+plotly>=5.0.0
+plotnine>=0.12.0
+matplotlib>=3.5.0
+seaborn>=0.13.0
+
+# Librerías de Geolocalización
+geopy>=2.3.0
+
+# Librerías de Utilidad
+joblib>=1.3.0
+streamlit>=1.28.0
+
+# Jupyter para Notebooks
+jupyter>=1.0.0
+jupyter-notebook>=7.0.0
+ipywidgets>=8.0.0
+
+# Otras dependencias usadas
+requests>=2.31.0
+tqdm>=4.65.0 
 
  
