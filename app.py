@@ -19,7 +19,7 @@ st.write("Esta herramienta utiliza un modelo **Random Forest** entrenado con dat
 st.markdown("---")
 
 # ==============================================================================
-# 2. FUNCIONES DE APOYO Y RECURSIVIDAD (Temas 5 y 10)
+# 2. FUNCIONES DE APOYO Y POO (Tema 5)
 # ==============================================================================
 def normalizar_house_type(df):
     df['house_type'] = df['house_type'].astype(str).str.strip()
@@ -41,20 +41,6 @@ def cargar_recursos():
     df_datos = normalizar_house_type(df_datos)
     encoders = joblib.load('models/diccionario_encoders.pkl')
     return modelo, df_datos, encoders
-
-# RECURSIVIDAD: Simulador de amortización mes a mes
-def calcular_meses_hipoteca_recursivo(deuda_restante, cuota_mensual, interes_anual, meses=0):
-    if deuda_restante <= 0: return meses
-    if meses > 600: return 600 # Límite de seguridad (50 años)
-        
-    interes_mensual = (interes_anual / 100) / 12
-    intereses_del_mes = deuda_restante * interes_mensual
-    amortizacion_real = cuota_mensual - intereses_del_mes
-    
-    if amortizacion_real <= 0: return -1 # La cuota no cubre los intereses
-         
-    nueva_deuda = deuda_restante - amortizacion_real
-    return calcular_meses_hipoteca_recursivo(nueva_deuda, cuota_mensual, interes_anual, meses + 1)
 
 # POO: Clase Tasador Inteligente
 class TasadorInteligente:
@@ -168,18 +154,16 @@ try:
             st.session_state.valor_final = valor_final
             st.session_state.prediccion_base = prediccion_base
             st.session_state.factor_estado = factor_estado
-            st.session_state.renta_municipio = renta # Guardamos la renta para la hipoteca
             
             st.balloons()
 
         # ==============================================================================
-        # 5. RESULTADOS, GRÁFICOS Y SIMULADOR HIPOTECARIO INTELIGENTE
+        # 5. RESULTADOS Y GRÁFICOS
         # ==============================================================================
         if st.session_state.valor_final is not None:
             valor_final_mem = st.session_state.valor_final
             prediccion_base_mem = st.session_state.prediccion_base
             factor_estado_mem = st.session_state.factor_estado
-            renta_mem = st.session_state.renta_municipio
 
             st.markdown("---")
             st.success(f"## Valor Estimado: {valor_final_mem:,.2f} €")
@@ -211,41 +195,6 @@ try:
                 st.write(f"**📈 Precio base histórico:** {prediccion_base_mem:,.2f} €")
                 st.write(f"**🛠️ Factor ({estado_sel}):** {factor_estado_mem:.2f}")
                 st.write(f"**📐 Precio por m²:** {int(valor_final_mem/metros)} €/m²")
-                
-                # ====================================================================
-                # LA LÓGICA HÍBRIDA CON AJUSTE TEMPORAL (INE 2021 -> 2026)
-                # ====================================================================
-                st.markdown("### 🏦 Simulador Hipoteca Inteligente")
-                
-                # Cálculo de Inflación Salarial (Ajuste de 2021 a 2026)
-                # Aplicamos un 2.5% anual compuesto durante 5 años
-                factor_inflacion_salarial = (1.025) ** 5 
-                renta_2026 = renta_mem * factor_inflacion_salarial
-                sueldo_medio_2026 = int(renta_2026 / 12)
-                
-                # Regla del 30% del Banco de España
-                cuota_maxima_recomendada = int(sueldo_medio_2026 * 0.30)
-                
-                st.caption(f"📈 **Ajuste Temporal:** Renta INE indexada a 2026 (+13.1% est.)")
-                st.caption(f"💡 Sueldo medio proyectado en **{ciudad_sel}**: **{sueldo_medio_2026} €/mes**.")
-                
-                # Entrada de sueldo (usamos el proyectado por defecto)
-                sueldo_usuario = st.number_input("Tu sueldo neto mensual en 2026 (€)", min_value=500, value=sueldo_medio_2026, step=100)
-                
-                # Cálculo de la cuota recomendada basada en el sueldo introducido
-                cuota_recomendada_usuario = int(sueldo_usuario * 0.30)
-                st.warning(f"🏦 Recomendación: Tu cuota no debería superar los **{cuota_recomendada_usuario} €/mes**.")
-                
-                # El usuario ajusta lo que quiere pagar (sugerimos el máximo recomendado)
-                cuota_mensual = st.number_input("Ajusta tu cuota mensual real (€)", min_value=100, value=cuota_recomendada_usuario, step=50)
-                
-                # MANTENEMOS LA RECURSIVIDAD PARA LA RÚBRICA
-                meses_necesarios = calcular_meses_hipoteca_recursivo(valor_final_mem, cuota_mensual, 3.5)
-                
-                if meses_necesarios == -1:
-                    st.error("⚠️ Con esa cuota no cubres los intereses anuales. Sube la cuota.")
-                else:
-                    st.info(f"Pagarías la casa en **{meses_necesarios} meses** ({meses_necesarios//12} años y {meses_necesarios%12} meses) al 3.5% TIN fijo.")
 
             # ==============================================================================
             # 6. DESCARGA DEL INFORME (.TXT) (Tema 17)
@@ -260,10 +209,6 @@ try:
             
             VALORACION FINAL ESTIMADA: {valor_final_mem:,.2f} EUR
             --------------------------------------------------
-            Simulación Hipoteca:
-            - Renta media del municipio ({ciudad_sel}): {renta_mem:,.2f} EUR/año
-            - Cuota elegida: {cuota_mensual} EUR/mes
-            - Tiempo estimado de pago: {meses_necesarios} meses ({meses_necesarios//12} años)
             """
             st.download_button(
                 label="📥 Descargar Informe Completo (.txt)",
