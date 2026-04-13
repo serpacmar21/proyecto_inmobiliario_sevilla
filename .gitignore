@@ -3,7 +3,7 @@ venv/
 .env
 
 # Archivos de datos pesados (El CSV pasadlo por un pendrive o Drive)
-data/raw/
+# data/raw/
 data/processed/*.csv
 
 # Archivos basura de Python
