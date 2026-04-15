@@ -8,12 +8,12 @@ from dagster import (
 import os
 import time
 
-# 1. LOGGING ESTRUCTURADO
+# LOGGING ESTRUCTURADO
 logger = get_dagster_logger()
 
-# ==============================================================================
+
 # FASE 1: PREPARACIÓN DE DATOS
-# ==============================================================================
+
 @asset(group_name="pipeline_inmobiliario", description="Fase 1: Limpieza paralela y cruce con INE")
 def datos_limpios() -> str:
     """Simula la ejecución del ETL y limpieza de datos con Dask."""
@@ -23,16 +23,16 @@ def datos_limpios() -> str:
     ruta_csv = os.path.join("data", "processed", "viviendas_sevilla_limpio.csv")
     
     if os.path.exists(ruta_csv):
-        logger.info(f"✅ Datos limpios y estructurados localizados en: {ruta_csv}")
+        logger.info(f"Datos limpios y estructurados localizados en: {ruta_csv}")
     else:
-        logger.warning(f"⚠️ Aviso: No se encontró {ruta_csv}. Usando ruta simulada para el DAG.")
+        logger.warning(f"Aviso: No se encontró {ruta_csv}. Usando ruta simulada para el DAG.")
         ruta_csv = "data/processed/viviendas_sevilla_limpio.csv"
         
     return ruta_csv
 
-# ==============================================================================
+
 # FASE 2: ENTRENAMIENTO DE IA (Depende de Fase 1)
-# ==============================================================================
+
 @asset(group_name="pipeline_inmobiliario", description="Fase 2: Entrenamiento Random Forest (Big Data) y CNN (Deep Learning)")
 def modelo_entrenado(datos_limpios: str) -> str:
     """Recibe los datos limpios y entrena los modelos de IA."""
@@ -46,16 +46,16 @@ def modelo_entrenado(datos_limpios: str) -> str:
     ruta_modelo = os.path.join("models", "modelo_casas_sevilla.pkl")
     
     if os.path.exists(ruta_modelo):
-        logger.info(f"✅ Modelos entrenados y serializados en: {ruta_modelo}")
+        logger.info(f"Modelos entrenados y serializados en: {ruta_modelo}")
     else:
-        logger.warning("⚠️ Aviso: No se encontró el .pkl. Usando ruta simulada.")
+        logger.warning("Aviso: No se encontró el .pkl. Usando ruta simulada.")
         ruta_modelo = "models/modelo_casas_sevilla.pkl"
         
     return ruta_modelo
 
-# ==============================================================================
+
 # FASE 3: DESPLIEGUE (Depende de Fase 2)
-# ==============================================================================
+
 @asset(group_name="pipeline_inmobiliario", description="Fase 3: Despliegue de la App en Streamlit")
 def app_desplegada(modelo_entrenado: str) -> bool:
     """Verifica que el modelo está listo y simula el levantamiento de la App."""
@@ -63,15 +63,14 @@ def app_desplegada(modelo_entrenado: str) -> bool:
     
     ruta_app = "app.py"
     if os.path.exists(ruta_app):
-        logger.info(f"✅ App lista. Ejecuta 'streamlit run {ruta_app}' en la terminal para interactuar.")
+        logger.info(f"App lista. Ejecuta 'streamlit run {ruta_app}' en la terminal para interactuar.")
         return True
     else:
-        logger.error(f"❌ Error: Falta el archivo {ruta_app}")
+        logger.error(f"Error: Falta el archivo {ruta_app}")
         return False
 
-# ==============================================================================
-# AUTOMATIZACIÓN Y SCHEDULING (El "toque del 10")
-# ==============================================================================
+
+# AUTOMATIZACIÓN Y SCHEDULING 
 
 # Definimos un "Trabajo" que agrupa todos nuestros assets
 actualizacion_semanal_job = define_asset_job(
@@ -80,7 +79,6 @@ actualizacion_semanal_job = define_asset_job(
 )
 
 # Definimos el "Horario" (Ej: Se ejecuta automáticamente cada Lunes a las 02:00 AM)
-# Esto es vital para cumplir el punto "Scheduling y automatización" de la rúbrica
 schedule_lunes_madrugada = ScheduleDefinition(
     job=actualizacion_semanal_job,
     cron_schedule="0 2 * * 1", # Formato CRON: Minuto 0, Hora 2, Todos los meses, Día 1 (Lunes)

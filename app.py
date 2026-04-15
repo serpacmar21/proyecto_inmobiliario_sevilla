@@ -4,23 +4,22 @@ import joblib
 import plotly.graph_objects as go
 import datetime
 
-# ==============================================================================
 # 1. CONFIGURACIÓN DE LA PÁGINA
-# ==============================================================================
+
 st.set_page_config(
     page_title="IA Inmobiliaria Sevilla 2026", 
     page_icon="🏠", 
     layout="wide"
 )
 
-st.title("🏠 Sistema de Valoración Inmobiliaria Inteligente")
+st.title("Sistema de Valoración Inmobiliaria Inteligente")
 st.markdown("### Análisis predictivo para la provincia de Sevilla (Actualizado a 2026)")
 st.write("Esta herramienta utiliza un modelo **Random Forest** entrenado con datos históricos, ajustado mediante un factor de corrección de mercado para reflejar precios actuales.")
 st.markdown("---")
 
-# ==============================================================================
-# 2. FUNCIONES DE APOYO Y POO (Tema 5)
-# ==============================================================================
+
+# 2. FUNCIONES DE APOYO Y POO (Programación Orientada a Objetos)
+
 def normalizar_house_type(df):
     df['house_type'] = df['house_type'].astype(str).str.strip()
     df['house_type'] = df['house_type'].replace({
@@ -56,9 +55,9 @@ class TasadorInteligente:
         valor_final = prediccion_base * self.factor_2026 * factor_estado
         return prediccion_base, valor_final
 
-# ==============================================================================
+
 # 3. INTERFAZ DE USUARIO PRINCIPAL
-# ==============================================================================
+
 try:
     modelo_rf, df, encoders = cargar_recursos()
     tasador = TasadorInteligente(modelo_rf, df)
@@ -66,7 +65,7 @@ try:
     col_izq, col_der = st.columns([1, 1], gap="large")
 
     with col_izq:
-        st.subheader("📍 Ubicación y Tipo de Inmueble")
+        st.subheader("Ubicación y Tipo de Inmueble")
         
         lista_ciudades = sorted(df['loc_city'].unique())
         ciudad_sel = st.selectbox("Selecciona el Municipio", lista_ciudades)
@@ -78,7 +77,7 @@ try:
         tipo_sel = st.selectbox("Tipo de Propiedad", tipos_filtrados)
 
         st.markdown("---")
-        st.subheader("📏 Características Físicas y Estado")
+        st.subheader("Características Físicas y Estado")
         
         estado_sel = st.selectbox("Estado de la vivienda", ["Buen estado", "A reformar", "Obra nueva"])
         metros = st.number_input("Superficie Total (m²)", min_value=25, max_value=1000, value=95)
@@ -88,8 +87,8 @@ try:
         with c2: banos = st.number_input("Baños", 1, 8, 2)
 
     with col_der:
-        st.subheader("✨ Equipamiento y Extras")
-        st.info("💡 Solo se muestran los extras que existen históricamente para este tipo de inmueble en esta zona.")
+        st.subheader("Equipamiento y Extras")
+        st.info("Solo se muestran los extras que existen históricamente para este tipo de inmueble en esta zona.")
         
         subset = df[(df['loc_city'] == ciudad_sel) & (df['loc_district'] == distrito_sel) & (df['house_type'] == tipo_sel)]
 
@@ -99,24 +98,24 @@ try:
 
         e1, e2 = st.columns(2)
         with e1:
-            piscina = st.checkbox("Piscina Privada/Comunitaria 🏊‍♂️") if extra_disponible('swimming_pool') and es_extra_logico(tipo_sel, 'swimming_pool') else False
-            garaje = st.checkbox("Plaza de Garaje 🚗") if extra_disponible('garage') and es_extra_logico(tipo_sel, 'garage') else False
-            ascensor = st.checkbox("Ascensor 🛗") if extra_disponible('lift') and es_extra_logico(tipo_sel, 'lift') else False
-            terraza = st.checkbox("Terraza ☀️") if extra_disponible('terrace') and es_extra_logico(tipo_sel, 'terrace') else False
+            piscina = st.checkbox("Piscina Privada/Comunitaria") if extra_disponible('swimming_pool') and es_extra_logico(tipo_sel, 'swimming_pool') else False
+            garaje = st.checkbox("Plaza de Garaje") if extra_disponible('garage') and es_extra_logico(tipo_sel, 'garage') else False
+            ascensor = st.checkbox("Ascensor") if extra_disponible('lift') and es_extra_logico(tipo_sel, 'lift') else False
+            terraza = st.checkbox("Terraza") if extra_disponible('terrace') and es_extra_logico(tipo_sel, 'terrace') else False
         with e2:
-            jardin = st.checkbox("Jardín 🌳") if extra_disponible('garden') and es_extra_logico(tipo_sel, 'garden') else False
-            trastero = st.checkbox("Trastero 📦") if extra_disponible('storage_room') and es_extra_logico(tipo_sel, 'storage_room') else False
-            balcon = st.checkbox("Balcón / Mirador 🖼️") if extra_disponible('balcony') and es_extra_logico(tipo_sel, 'balcony') else False
+            jardin = st.checkbox("Jardín") if extra_disponible('garden') and es_extra_logico(tipo_sel, 'garden') else False
+            trastero = st.checkbox("Trastero") if extra_disponible('storage_room') and es_extra_logico(tipo_sel, 'storage_room') else False
+            balcon = st.checkbox("Balcón / Mirador") if extra_disponible('balcony') and es_extra_logico(tipo_sel, 'balcony') else False
 
         st.markdown("<br><br>", unsafe_allow_html=True)
 
-        # ==============================================================================
+        
         # 4. LÓGICA DE PREDICCIÓN Y MEMORIA DE SESIÓN
-        # ==============================================================================
+        
         if 'valor_final' not in st.session_state:
             st.session_state.valor_final = None
 
-        if st.button("💰 CALCULAR VALORACIÓN MERCADO 2026", use_container_width=True):
+        if st.button("CALCULAR VALORACIÓN MERCADO 2026", use_container_width=True):
             def codificar_local(columna, valor):
                 return encoders[columna].transform([valor])[0]
 
@@ -155,11 +154,9 @@ try:
             st.session_state.prediccion_base = prediccion_base
             st.session_state.factor_estado = factor_estado
             
-            st.balloons()
 
-        # ==============================================================================
         # 5. RESULTADOS Y GRÁFICOS
-        # ==============================================================================
+        
         if st.session_state.valor_final is not None:
             valor_final_mem = st.session_state.valor_final
             prediccion_base_mem = st.session_state.prediccion_base
@@ -171,7 +168,7 @@ try:
             col_graf, col_datos = st.columns([1.5, 1])
             
             with col_graf:
-                # Tema 16: Gráfico Avanzado Plotly
+                # Gráfico Avanzado Plotly
                 fig = go.Figure(go.Indicator(
                     mode = "gauge+number+delta",
                     value = valor_final_mem,
@@ -190,15 +187,15 @@ try:
                 st.plotly_chart(fig, use_container_width=True)
 
             with col_datos:
-                st.write(f"**🏠 Tipo:** {tipo_sel} ({metros} m²)")
-                st.write(f"**📍 Zona:** {distrito_sel} ({ciudad_sel})")
-                st.write(f"**📈 Precio base histórico:** {prediccion_base_mem:,.2f} €")
-                st.write(f"**🛠️ Factor ({estado_sel}):** {factor_estado_mem:.2f}")
-                st.write(f"**📐 Precio por m²:** {int(valor_final_mem/metros)} €/m²")
+                st.write(f"**Tipo:** {tipo_sel} ({metros} m²)")
+                st.write(f"**Zona:** {distrito_sel} ({ciudad_sel})")
+                st.write(f"**Precio base histórico:** {prediccion_base_mem:,.2f} €")
+                st.write(f"**Factor ({estado_sel}):** {factor_estado_mem:.2f}")
+                st.write(f"**Precio por m²:** {int(valor_final_mem/metros)} €/m²")
 
-            # ==============================================================================
-            # 6. DESCARGA DEL INFORME (.TXT) (Tema 17)
-            # ==============================================================================
+            
+            # 6. DESCARGA DEL INFORME (.txt)
+            
             texto_informe = f"""
             INFORME DE TASACION INTELIGENTE - IA SEVILLA 2026
             --------------------------------------------------
@@ -211,7 +208,7 @@ try:
             --------------------------------------------------
             """
             st.download_button(
-                label="📥 Descargar Informe Completo (.txt)",
+                label="Descargar Informe Completo (.txt)",
                 data=texto_informe, file_name=f"tasacion_{ciudad_sel}_{metros}m2.txt", mime="text/plain", use_container_width=True
             )
 
