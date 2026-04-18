@@ -46,7 +46,7 @@ Para lanzar la interfaz interactiva de tasación, ejecuta:
 streamlit run app.py
 ```
 
-## Orquestación (Opcional)
+## Orquestación
 Si deseas ver el pipeline de datos en funcionamiento con **Dagster**:
 ```bash
 dagster dev -f tasador_pipeline.py
