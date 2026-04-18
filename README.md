@@ -34,9 +34,11 @@ uv venv --python A.B.C
 - **macOS/Linux:** `source .venv/bin/activate`
 
 ### 3. Instalar dependencias
-```bash
-uv pip install -r requirements.txt
-```
+Para ejecutar solo la web (Producción):
+`uv pip install -r requirements.txt`
+
+Para ejecutar los Notebooks con Dask y PyTorch (Desarrollo):
+`uv pip install -r requirements_dev.txt`
 
 ## Ejecución de la Aplicación
 Para lanzar la interfaz interactiva de tasación, ejecuta:
