@@ -15,7 +15,7 @@ distributed>=2023.0.0
 dagster>=1.5.0
 
 # Librerías de Visualización
-plotly
+plotly>=5.0.0
 plotnine>=0.12.0
 matplotlib>=3.5.0
 seaborn>=0.13.0
