@@ -22,27 +22,23 @@ La tasación manual de viviendas es un proceso lento y a menudo subjetivo. Esta 
 - `requirements.txt`: Dependencias del sistema.
 
 ## Instalación y Reproducibilidad
-Este proyecto utiliza `uv` para la gestión eficiente de entornos y dependencias. 
-
-**Nota arquitectónica:** Para evitar el colapso de memoria en el despliegue web de la aplicación, las dependencias se han dividido siguiendo buenas prácticas de MLOps:
-* `requirements.txt`: Contiene las librerías ligeras necesarias exclusivamente para desplegar la app en producción.
-* `requirements_dev.txt`: Contiene el entorno completo (incluyendo Dask, PyTorch y Dagster) necesario para la experimentación, orquestación y evaluación del proyecto.
+Este proyecto utiliza `uv` para la gestión eficiente de entornos y dependencias.
 
 ### 1. Crear el entorno virtual
-Ejecuta los siguientes comandos (sustituyendo `3.10` por tu versión de Python, en nuestro caso hemos usado Python 3.10):
 ```bash
-uv venv --python 3.10
+uv venv --python A.B.C
 ```
 
 ### 2. Activar el entorno
-
 - **Windows:** `.venv\Scripts\activate`
 - **macOS/Linux:** `source .venv/bin/activate`
 
 ### 3. Instalar dependencias
-```bash
-uv pip install -r requirements.txt
-```
+Para ejecutar solo la web (Producción):
+`uv pip install -r requirements.txt`
+
+Para ejecutar los Notebooks con Dask y PyTorch (Desarrollo):
+`uv pip install -r requirements_dev.txt`
 
 ## Ejecución de la Aplicación
 Para lanzar la interfaz interactiva de tasación, ejecuta:
