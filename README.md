@@ -40,9 +40,8 @@ uv venv --python 3.10
 - **macOS/Linux:** `source .venv/bin/activate`
 
 ### 3. Instalar dependencias
-
 ```bash
-uv pip install -r requirements_dev.txt
+uv pip install -r requirements.txt
 ```
 
 ## Ejecución de la Aplicación
@@ -51,7 +50,7 @@ Para lanzar la interfaz interactiva de tasación, ejecuta:
 streamlit run app.py
 ```
 
-## Orquestación (Opcional)
+## Orquestación
 Si deseas ver el pipeline de datos en funcionamiento con **Dagster**:
 ```bash
 dagster dev -f tasador_pipeline.py
