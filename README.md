@@ -23,15 +23,15 @@ La tasación manual de viviendas es un proceso lento y a menudo subjetivo. Esta 
 - `src/`:
     - `tasador_pipeline.py`: Orquestación del flujo de datos con Dagster.
 - `app.py`: Interfaz de usuario multipágina (Tasador Interactivo + Análisis de Mercado con XAI) desarrollada en Streamlit utilizando Programación Orientada a Objetos (POO). Aplica internamente un factor de corrección para adaptar los precios aprendidos históricamente (2021) al mercado actual (2026).
-- `requirements.txt`: Dependencias para el entorno de producción (Web).
-- `requirements_dev.txt`: Dependencias para el entorno de desarrollo (Notebooks, Big Data y Orquestación).
+- `pyproject.toml`: Archivo de configuración moderno para la gestión de dependencias y entornos con `uv`.
+- `requirements.txt`: Dependencias para el entorno de producción (Web) mantenidas como respaldo de compatibilidad.
 
 ## Instalación y Reproducibilidad
-Este proyecto utiliza `uv` para la gestión eficiente de entornos y dependencias.
+Este proyecto utiliza `uv` y el estándar `pyproject.toml` para la gestión eficiente, rápida y determinista de entornos y dependencias.
 
 ### 1. Crear el entorno virtual
 ```bash
-uv venv --python A.B.C
+uv venv
 ```
 
 ### 2. Activar el entorno
@@ -39,11 +39,18 @@ uv venv --python A.B.C
 - **macOS/Linux:** `source .venv/bin/activate`
 
 ### 3. Instalar dependencias
-Para ejecutar solo la web (Producción):
-`uv pip install -r requirements.txt`
 
-Para ejecutar los Notebooks con Dask y PyTorch (Desarrollo):
-`uv pip install -r requirements_dev.txt`
+Para cumplir con los requisitos del proyecto, utiliza el comando de sincronización:
+
+Para instalar las dependencias base y ejecutar la web (Producción):
+
+`uv sync`
+
+Para instalar también las herramientas de desarrollo (Dask, Dagster y Jupyter Notebooks):
+
+`uv sync --all-extras`
+
+*Nota:* Si lo prefieres, también puedes usar el archivo tradicional para el entorno de producción:
 
 ## Ejecución de la Aplicación
 Para lanzar la interfaz interactiva de tasación, ejecuta:
@@ -54,7 +61,7 @@ streamlit run app.py
 ## Orquestación
 Si deseas ver el pipeline de datos en funcionamiento con **Dagster**:
 ```bash
-dagster dev -f tasador_pipeline.py
+dagster dev -f src/tasador_pipeline.py
 ```
 
 ## Tecnologías Destacadas
