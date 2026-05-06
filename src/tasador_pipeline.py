@@ -34,7 +34,7 @@ def datos_limpios() -> str:
 # FASE 2: ENTRENAMIENTO DE IA (Depende de Fase 1)
 
 @asset(group_name="pipeline_inmobiliario", description="Fase 2: Entrenamiento Random Forest (Big Data) y CNN (Deep Learning)")
-def modelo_entrenado(datos_limpios: str) -> str:
+def modelo_entrenado(datos_limpios: str) -> dict:
     """Recibe los datos limpios y entrena los modelos de IA."""
     logger.info(f"Consumiendo datos de: {datos_limpios}")
     logger.info("Activando clúster Dask local para entrenamiento distribuido...")
@@ -43,30 +43,40 @@ def modelo_entrenado(datos_limpios: str) -> str:
     logger.info("Entrenando Red Neuronal (CNN 1D) con PyTorch...")
     time.sleep(1)
     
-    ruta_modelo = os.path.join("models", "modelo_casas_sevilla.pkl")
+    # Ahora verificamos las dos arquitecturas clave
+    ruta_rf = os.path.join("models", "modelo_casas_sevilla.pkl")
+    ruta_dl = os.path.join("models", "modelo_pytorch.pth")
     
-    if os.path.exists(ruta_modelo):
-        logger.info(f"Modelos entrenados y serializados en: {ruta_modelo}")
-    else:
-        logger.warning("Aviso: No se encontró el .pkl. Usando ruta simulada.")
-        ruta_modelo = "models/modelo_casas_sevilla.pkl"
-        
-    return ruta_modelo
+    modelos_listos = {
+        "Random Forest": ruta_rf if os.path.exists(ruta_rf) else "Simulado_RF.pkl",
+        "Deep Learning CNN": ruta_dl if os.path.exists(ruta_dl) else "Simulado_DL.pth"
+    }
+    
+    for modelo, ruta in modelos_listos.items():
+        if "Simulado" not in ruta:
+            logger.info(f"{modelo} entrenado y serializado en: {ruta}")
+        else:
+            logger.warning(f"Aviso: No se encontró archivo real para {modelo}. Usando ruta simulada.")
+            
+    # Devolvemos un diccionario en lugar de un string único
+    return modelos_listos
 
 
 # FASE 3: DESPLIEGUE (Depende de Fase 2)
 
 @asset(group_name="pipeline_inmobiliario", description="Fase 3: Despliegue de la App en Streamlit")
-def app_desplegada(modelo_entrenado: str) -> bool:
-    """Verifica que el modelo está listo y simula el levantamiento de la App."""
-    logger.info(f"Cargando modelo en memoria desde: {modelo_entrenado}")
+def app_desplegada(modelo_entrenado: dict) -> bool:
+    """Verifica que los modelos están listos y simula el levantamiento de la App."""
+    logger.info("Cargando los siguientes modelos en la memoria de producción:")
+    for nombre, ruta in modelo_entrenado.items():
+        logger.info(f" -> Cargando {nombre} desde: {ruta}")
     
     ruta_app = "app.py"
     if os.path.exists(ruta_app):
         logger.info(f"App lista. Ejecuta 'streamlit run {ruta_app}' en la terminal para interactuar.")
         return True
     else:
-        logger.error(f"Error: Falta el archivo {ruta_app}")
+        logger.error(f"Error crítico: Falta el archivo {ruta_app}")
         return False
 
 
