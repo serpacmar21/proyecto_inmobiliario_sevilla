@@ -1,0 +1,29 @@
+[project]
+name = "proyecto-inmobiliario-sevilla"
+version = "0.1.0"
+description = "Tasador inteligente con ML, Deep Learning y Orquestación"
+readme = "README.md"
+requires-python = ">=3.11"
+dependencies = [
+    "streamlit",
+    "pandas",
+    "numpy",
+    "scikit-learn",
+    "joblib",
+    "plotly",
+    "matplotlib",
+    "seaborn",
+    "torch",
+]
+
+[project.optional-dependencies]
+dev = [
+    "dask",
+    "dagster",
+    "dagster-webserver",
+    "jupyter",
+]
+
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
