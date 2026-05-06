@@ -12,7 +12,7 @@ __pycache__/
 .ipynb_checkpoints/
 
 # Modelos pesados (opcional, pero recomendable no subirlos)
-models/*.pkl
+# models/*.pkl
 
 # Dagster
 .tmp_dagster_home_*
